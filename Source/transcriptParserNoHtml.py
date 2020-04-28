@@ -3,7 +3,6 @@
 
 
 import re
-import csv
 from bs4 import BeautifulSoup
 import os
 
@@ -25,16 +24,16 @@ for dir in os.listdir(transcriptsDir):  # for each season
 
     for filename in os.listdir(seasonDir):  # for each episode in season
         episodePath = os.path.join(seasonDir, filename)  # path to episode
-        parsedEpisodePath = os.path.join(parsedSeasonDir, os.path.splitext(filename)[0] + '.csv')  # path to parsed file
+        parsedEpisodePath = os.path.join(parsedSeasonDir, os.path.splitext(filename)[0] + '.txt')  # path to parsed file
 
         curFile = open(episodePath)
         soup = BeautifulSoup(curFile, 'html.parser')
         text = soup.getText()
         text = text.splitlines()
 
-        with open(parsedEpisodePath, 'w', newline='') as csvfile:
+        with open(parsedEpisodePath, 'w', newline='') as txtfile:
 
-            fileWriter = csv.writer(csvfile, delimiter='|')
+            # fileWriter = csv.writer(txtfile, delimiter=':')
             started = False
             character = ""
             sentence = ""
@@ -52,7 +51,8 @@ for dir in os.listdir(transcriptsDir):  # for each season
                     line = str(line).replace('\n', ' ').lower()
 
                     # REMOVE DIRECTIONS
-                    line = re.sub(r'\(.*\)', '', line)  # remove everything between ()
+                    line = re.sub(r'\(.*\)?', '', line)  # remove everything between ()
+                    line = re.sub(r'\(?.*\)', '', line)  # remove everything between ()
                     # REMOVE SCENE
                     # Sometimes one dialog is split over multiple lines, so there might be only [ or ]
                     line = re.sub(r'\[.*\]?', '', line)  # remove everything between []
@@ -62,11 +62,13 @@ for dir in os.listdir(transcriptsDir):  # for each season
                     if re.search(':', line) is not None:
                         if not sentence == "" and not character == "":
                             output.append(sentence)
-                            fileWriter.writerow(output)
+                            output.append("\n\n")
+                            txtfile.writelines(output)
                             output = []
                             character, sentence = "", ""
                         character, sentence = line.split(':', 1)
-                        output.append(character)
+                        character = character.upper()
+                        output.append(character + ":\n")
 
                     # If lines belong together but are split over multiple lines, concatenate them
                     else:
