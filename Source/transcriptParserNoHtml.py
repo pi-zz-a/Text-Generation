@@ -6,7 +6,6 @@ import re
 from bs4 import BeautifulSoup
 import os
 
-
 scriptPath = os.path.abspath(__file__)  # path to python script
 scriptDir = os.path.dirname(os.path.split(scriptPath)[0])  # path to python script dir
 transcriptsDir = os.path.join(scriptDir, "Data\\transcripts")  # path to transcripts dir
@@ -15,23 +14,28 @@ parsedTranscriptsDir = os.path.join(scriptDir, "Data\\parsedTranscripts")
 if not os.path.exists(parsedTranscriptsDir):
     os.makedirs(parsedTranscriptsDir)
 
-for dir in os.listdir(transcriptsDir):  # for each season
-    seasonDir = os.path.join(transcriptsDir, dir)  # path to season dir
+parsedEpisodePath = os.path.join(parsedTranscriptsDir, 'allEpisodes.txt')
+with open(parsedEpisodePath, 'w', newline='') as txtfile:
+    for dir in os.listdir(transcriptsDir):  # for each season
+        seasonDir = os.path.join(transcriptsDir, dir)  # path to season dir
 
-    parsedSeasonDir = os.path.join(parsedTranscriptsDir, dir)
-    if not os.path.exists(parsedSeasonDir):
-        os.mkdir(parsedSeasonDir)
+        # for each episode in an individual file:
+        # parsedSeasonDir = os.path.join(parsedTranscriptsDir, dir)
+        # if not os.path.exists(parsedSeasonDir):
+        #     os.mkdir(parsedSeasonDir)
 
-    for filename in os.listdir(seasonDir):  # for each episode in season
-        episodePath = os.path.join(seasonDir, filename)  # path to episode
-        parsedEpisodePath = os.path.join(parsedSeasonDir, os.path.splitext(filename)[0] + '.txt')  # path to parsed file
+        for filename in os.listdir(seasonDir):  # for each episode in season
+            episodePath = os.path.join(seasonDir, filename)  # path to episode
+            # for each episode in an individual file:
+            # parsedEpisodePath = os.path.join(parsedSeasonDir, os.path.splitext(filename)[0] + '.txt')  # path to parsed file
 
-        curFile = open(episodePath)
-        soup = BeautifulSoup(curFile, 'html.parser')
-        text = soup.getText()
-        text = text.splitlines()
+            curFile = open(episodePath)
+            soup = BeautifulSoup(curFile, 'html.parser')
+            text = soup.getText()
+            text = text.splitlines()
 
-        with open(parsedEpisodePath, 'w', newline='') as txtfile:
+            # for each episode in an individual file:
+            # with open(parsedEpisodePath, 'w', newline='') as txtfile:
 
             # fileWriter = csv.writer(txtfile, delimiter=':')
             started = False
@@ -68,11 +72,21 @@ for dir in os.listdir(transcriptsDir):  # for each season
                             character, sentence = "", ""
                         character, sentence = line.split(':', 1)
                         character = character.upper()
-                        output.append(character + ":\n")
+                        if character == "CHAN":
+                            character = "CHANDLER"
+                        if character == "MNCA":
+                            character = "MONICA"
+                        if character == "RACH":
+                            character = "RACHEL"
+                        if character == "PHOE":
+                            character = "PHOEBE"
+                        if character == "RACHEL" or character == "CHANDLER" or character == "JOEY" \
+                                or character == "PHOEBE" or character == "ROSS" or character == "MONICA":
+                            output.append(character + ":\n")
 
                     # If lines belong together but are split over multiple lines, concatenate them
                     else:
                         if sentence == "end":
                             break
                         sentence += " " + line
-
+    txtfile.close()
