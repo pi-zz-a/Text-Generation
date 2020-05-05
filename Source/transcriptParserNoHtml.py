@@ -52,7 +52,11 @@ with open(parsedEpisodePath, 'w', newline='') as txtfile:
                         continue
 
                 if started:
-                    line = str(line).replace('\n', ' ').lower()
+                    line = str(line).replace('\n', ' ')
+                    # nonBreakSpace = u'\xa0'
+                    # line = line.replace(nonBreakSpace, ' ')
+                    line = re.sub(r'[\t\n\v\f\r\xa0\s\u2014]', ' ', line)
+                    line = re.sub(r'[^\w?!:,. ]|[À-ú]', '', line)
 
                     # REMOVE DIRECTIONS
                     line = re.sub(r'\(.*\)?', '', line)  # remove everything between ()
@@ -71,7 +75,6 @@ with open(parsedEpisodePath, 'w', newline='') as txtfile:
                             output = []
                             character, sentence = "", ""
                         character, sentence = line.split(':', 1)
-                        character = character.upper()
                         if character == "CHAN":
                             character = "CHANDLER"
                         if character == "MNCA":
@@ -80,13 +83,14 @@ with open(parsedEpisodePath, 'w', newline='') as txtfile:
                             character = "RACHEL"
                         if character == "PHOE":
                             character = "PHOEBE"
-                        if character == "RACHEL" or character == "CHANDLER" or character == "JOEY" \
-                                or character == "PHOEBE" or character == "ROSS" or character == "MONICA":
-                            output.append(character + ":\n")
+                        # if character == "RACHEL" or character == "CHANDLER" or character == "JOEY" \
+                        #         or character == "PHOEBE" or character == "ROSS" or character == "MONICA":
+                        output.append(character + ":\n")
 
                     # If lines belong together but are split over multiple lines, concatenate them
                     else:
                         if sentence == "end":
                             break
-                        sentence += " " + line
+                        if not "commercial break" in line.lower():
+                            sentence += " " + line
     txtfile.close()

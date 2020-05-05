@@ -1,6 +1,30 @@
-# Thanks to the team at huggingface for providing their example
-# on fine_tuning a dataset, this dataset class borrows heavily from that it.
-# Find a link to their example below
+import logging
+import os
+import pickle
+
+import torch
+import torch.nn as nn
+import transformers
+from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler
+from transformers import (
+    GPT2Config,
+    GPT2LMHeadModel,
+    GPT2PreTrainedModel,
+    GPT2Tokenizer,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+)
+
+MODEL_CLASSES = {"gpt2": (GPT2Config, GPT2LMHeadModel, GPT2Tokenizer)}
+
+FILE_PATH = os.path.join("script_buddy", "data", "film_text.txt")
+
+logger = logging.getLogger(__name__)
+
+
+# Big thanks to the team at huggingface for providing their example
+# on fine_tuning a dataset, this borrows heavily from that it.
+# Please find a link to it below :-)
 # https://github.com/huggingface/transformers/blob/master/examples/run_language_modeling.py
 
 
@@ -59,3 +83,23 @@ class ScriptData(Dataset):
 
     def __getitem__(self, item):
         return torch.tensor(self.examples[item], dtype=torch.long)
+
+
+if __name__ == "__main__":
+    tokenizer = GPT2Tokenizer.from_pretrained("gpt2-medium")
+    model = GPT2LMHeadModel.from_pretrained("gpt2-medium")
+
+    model.train()
+    sc = ScriptData(tokenizer, file_path=FILE_PATH, overwrite_cache=True)
+
+    # criterion = nn.CrossEntropyLoss()
+    # optimizer = torch.optim.Adam(model.parameters(), lr=3e-5, eps=1e-08)
+    # trainer = create_supervised_trainer(model, optimizer, criterion)
+
+    # train_loader = DataLoader(dataset=sc, batch_size=64, shuffle=True, num_workers=0)
+
+    # trainer.run(train_loader, 1)
+
+    # optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
+    # loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    # metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
