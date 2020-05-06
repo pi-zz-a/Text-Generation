@@ -1,3 +1,7 @@
+# This code is obtained from https://github.com/cdpierse/script_buddy_v2/blob/master/script_buddy/language_modelling.py
+# and is completely written by Charles Pierse
+
+
 import logging
 import os
 import pickle
@@ -17,7 +21,7 @@ from transformers import (
 
 MODEL_CLASSES = {"gpt2": (GPT2Config, GPT2LMHeadModel, GPT2Tokenizer)}
 
-FILE_PATH = os.path.join("script_buddy", "data", "film_text.txt")
+FILE_PATH = os.path.join("Data", "parsedTranscripts", "allEpisodes.txt")
 
 logger = logging.getLogger(__name__)
 
